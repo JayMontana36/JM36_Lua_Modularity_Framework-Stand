@@ -367,6 +367,6 @@ init()
 util.on_stop(Scripts_Stop)
 
 util.create_tick_handler(function()
-    tick()
+	tick()
 	return true
 end)

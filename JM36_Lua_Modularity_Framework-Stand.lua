@@ -218,27 +218,6 @@ local function _init()
 		package.path = string_format(".\\?;%s?;%slibs\\?;%slibs\\?\\init;%s", Directory, Directory, Directory, package.path) -- NoExtension
 	end
 	
-	--[[ Automatically load __libs ]]
-	local __libs_List, __libs_NMBR = {}, 0
-	local ___libs_List = filesystem.list_files(__Script_Libs)
-	for i=1, #___libs_List do
-		local __lib = ___libs_List[i]
-		if string_endsWith(__lib, ".lua") then
-			__libs_NMBR = __libs_NMBR+1
-			__libs_List[__libs_NMBR] = string_gsub(string_split(__lib, "//")[3], ".lua", "")
-		end
-	end
-	table.sort(__libs_List)
-	local pcall, require
-		= pcall, require
-	local Successful, __lib
-	for i=1, __libs_NMBR do
-		Successful, __lib = pcall(require, __libs_List[i])
-		if not Successful then
-			print(__lib)
-		end
-	end
-	
 	require(Natives)
 	if Natives_FiveM then
 		--[[ Introduce/Create FiveM style game native function calls ]]
@@ -371,6 +350,27 @@ local function _init()
 					end
 	})
 	Info.Player = Player
+	
+	--[[ Automatically load __libs ]]
+	local __libs_List, __libs_NMBR = {}, 0
+	local ___libs_List = filesystem.list_files(__Script_Libs)
+	for i=1, #___libs_List do
+		local __lib = ___libs_List[i]
+		if string_endsWith(__lib, ".lua") then
+			__libs_NMBR = __libs_NMBR+1
+			__libs_List[__libs_NMBR] = string_gsub(string_split(__lib, "//")[3], ".lua", "")
+		end
+	end
+	table.sort(__libs_List)
+	local pcall, require
+		= pcall, require
+	local Successful, __lib
+	for i=1, __libs_NMBR do
+		Successful, __lib = pcall(require, __libs_List[i])
+		if not Successful then
+			print(__lib)
+		end
+	end
 	
 	--[[ Perform scripts initialization ]]
 	Scripts_Init()

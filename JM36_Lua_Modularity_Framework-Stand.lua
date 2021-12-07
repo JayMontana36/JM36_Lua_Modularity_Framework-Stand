@@ -3,7 +3,7 @@ Natives				= "natives-1627063482"
 Natives_FiveM		= true
 Natives_FiveM_Only	= false
 DebugMode			= false
-Script_Home			= string.format("%s%s//", filesystem.scripts_dir(), SCRIPT_NAME)
+Script_Home			= string.format("%s%s//", filesystem.store_dir(), SCRIPT_NAME)--filesystem.resources_dir()
 Info_Update_Delay	= 500
 
 

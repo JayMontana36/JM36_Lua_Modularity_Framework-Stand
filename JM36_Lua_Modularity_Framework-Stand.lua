@@ -1,5 +1,5 @@
 --[[ Config Area ]]
-Natives              = "natives-1627063482"
+Natives              = "natives-1640181023"
 Natives_FiveM        = true
 Natives_FiveM_Only   = false
 DebugMode            = false
@@ -14,6 +14,7 @@ __Script_Modules = Script_Home.."__Modules//" -- Shared Script Components/Resour
 Script_Libs = Script_Home.."libs//" -- Standard libs Directory For Environment
 __Script_Libs = Script_Home.."__libs//" -- Automatically Loaded libs On Startup
 
+local util = util
 local tostring, table_concat, util_toast
     = tostring, table.concat, util.toast
 print = function(...)
@@ -378,7 +379,7 @@ local function _init()
     --[[ Add Reload Option With Debug Mode ]]
     if DebugMode then
         local Scripts_Init = function()Scripts_Init()end -- Required as Stand errors and complains otherwise - function tables unsupported.
-		local menu = menu
+        local menu = menu
         menu.action(menu.my_root(), "Reload Modules", {"elements reload", "reload elements", "reload modules"}, "", Scripts_Init)
     end
     
@@ -393,7 +394,12 @@ local function init()
     collectgarbage()
     Scripts_Init()
 end
-init()
+if SCRIPT_MANUAL_START then
+    util.execute_in_os_thread(init)
+else
+    init()
+end
+--[[init()]]--[[util.execute_in_os_thread(init)]]
 
 util.on_stop(Scripts_Stop)
 

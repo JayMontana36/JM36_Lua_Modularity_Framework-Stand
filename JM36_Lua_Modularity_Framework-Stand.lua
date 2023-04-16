@@ -112,6 +112,7 @@ do
 			for k,v in pairs(config) do
 				configFile:write(("%s%s%s\n"):format(k, sep, tostring(v)))
 			end
+			configFile:close()
 		end
 	end
 end
@@ -376,7 +377,7 @@ do
 		if Successful then
 			local Type = type(Function)
 			if Type == "table" then
-				if not Function.InfoKeyOnly then
+				if (not Function.InfoKeyOnly) and (getmetatable(Function) and getmetatable(Function).__call) then
 					FunctionsNum = FunctionsNum + 1
 					Functions[FunctionsNum] = Function
 				end

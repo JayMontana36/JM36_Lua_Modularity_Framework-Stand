@@ -36,10 +36,11 @@ local collectgarbage = collectgarbage
 
 
 --[[ Create secondary "global" table for storing tables containing "global" functions, such as natives. ]]
+local GlobalsWarnAndRedirect
 do
 	local _G2 = setmetatable
 	(
-		{},
+		{_GlobalVariables={}},
 		{
 			__index = function(Self,Key)
 				for k,v in pairs(Self) do
@@ -56,6 +57,15 @@ do
 		{
 			__index = function(Self,Key)
 				return _G2[Key]
+			end,
+			__newindex = function(Self,Key,Value)
+				local DebugData = debug.getinfo(2,'lS')
+				if DebugData and GlobalsWarnAndRedirect and not (DebugData.what == 'main' or DebugData.short_src == 'scripts/main.lua') then
+					print(('[Warning - Script]	%s:%s\n	Variable "%s" (%s) declared global (use local).'):format(DebugData.short_src, DebugData.currentline, Key, type(Value)))
+					_G2._GlobalVariables[Key] = Value
+				else
+					rawset(Self,Key,Value)
+				end
 			end
 		}
 	)
@@ -207,7 +217,8 @@ local JM36 =
 		end,
 	Wait=0,
 	wait=0,
-	yield=0
+	yield=0,
+	yield_once=coroutine_yield
 }
 do
 	local Halt = function(ms)
@@ -221,7 +232,6 @@ do
 		end
 	end
 	JM36.Wait, JM36.wait, JM36.yield = Halt, Halt, Halt
-	JM36.CreateThread_HighPriority(function() wait=JM36.wait;IsKeyPressed=get_key_pressed end)
 end
 _G.JM36 = JM36
 
@@ -360,6 +370,9 @@ do
 	
 	package.path = ("%s?.lua;%s?.luac"):format(__Internal_Path,__Internal_Path)
 	
+	if not filesystem_exists(__Internal_Path) then
+		filesystem_mkdir(__Internal_Path)
+	end
 	local List, ListNum = {}, 0
 	for i, Lib in filesystem.list_files(__Internal_Path) do
 		if Lib:endsWith(".lua") then
